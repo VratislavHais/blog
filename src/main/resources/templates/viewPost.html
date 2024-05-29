@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${post.title}">Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .author {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .info {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+        .tags {
+            margin-bottom: 20px;
+        }
+        .tags span {
+            margin-right: 10px;
+            background-color: #007bff;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .content {
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .comments-section {
+            margin-top: 40px;
+        }
+        .comment {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .comment p {
+            margin: 0;
+        }
+        .add-comment {
+            margin-top: 20px;
+        }
+        .add-comment form {
+            display: flex;
+            flex-direction: column;
+        }
+        .add-comment label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .add-comment input, .add-comment textarea {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .add-comment textarea {
+            resize: vertical;
+        }
+        .add-comment button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        .add-comment button:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${post.title}"></h1>
+    <p class="author">By: <span th:text="${post.author.fullName}"></span></p>
+    <p class="info">Created At: <span th:text="${post.createdAt}"></span></p>
+    <p class="info">Updated At: <span th:text="${post.updatedAt}"></span></p>
+    <p class="info">Category: <span th:text="${post.category.name}"></span></p>
+    <div class="tags">
+        <span th:each="tag : ${post.tags}" th:text="${tag.name}"></span>
+    </div>
+    <div class="content">
+        <p th:text="${post.content}"></p>
+    </div>
+
+    <div class="comments-section">
+        <h2>Comments</h2>
+        <div th:each="comment : ${post.comments}" class="comment">
+            <p th:text="${comment.content}"></p>
+            <p><strong th:text="${comment.authorName}"></strong></p>
+        </div>
+    </div>
+
+    <div class="add-comment">
+        <h2>Add a Comment</h2>
+        <form th:action="@{/post/{postId}/comments}" th:object="${newComment}" method="post">
+            <label for="author">Name:</label>
+            <input type="text" id="author" th:field="*{author}" required />
+            <label for="content">Comment:</label>
+            <textarea id="content" th:field="*{content}" rows="5" required></textarea>
+            <button type="submit">Add Comment</button>
+        </form>
+    </div>
+
+    <a href="/" class="back-link">Back to Home</a>
+</div>
+</body>
+</html>

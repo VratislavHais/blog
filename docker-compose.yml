@@ -1,0 +1,15 @@
+version: '3.8'
+
+networks:
+  default:
+
+services:
+  db:
+    user: "1000"
+    image: mysql:5.7
+    container_name: blog
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: blog

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav {
+            margin: 20px;
+            text-align: right;
+        }
+        nav a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 15px;
+        }
+        nav a.button {
+            padding: 10px 20px;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+        nav a.button:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 20px;
+        }
+        ul li a {
+            font-size: 20px;
+            color: #333;
+            text-decoration: none;
+        }
+        ul li a:hover {
+            text-decoration: underline;
+        }
+        ul li p {
+            color: #666;
+        }
+        .create-post {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .create-post a {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .create-post a:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Blog Posts</h1>
+</header>
+<nav>
+    <a href="/login" class="button">Login</a>
+    <a href="/register" class="button">Register</a>
+</nav>
+<div class="container">
+    <ul>
+        <li th:each="post : ${posts}">
+            <a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}"></a>
+        </li>
+    </ul>
+    <div class="create-post">
+        <a href="/post/create">Create New Post</a>
+    </div>
+</div>
+</body>
+</html>
