@@ -15,14 +15,17 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
+// can't use @Data as it generates hashCode using fields. This is problematic with usage of Set when fetching from database
 @Entity
 @Table
 @Getter
 @Setter
+@ToString
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
