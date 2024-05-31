@@ -57,6 +57,30 @@
             font-size: 14px;
             margin-top: 5px;
         }
+        .home-link {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        register-link {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .register-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .register-link a:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
     </style>
 </head>
 <body>
@@ -72,6 +96,16 @@
         <input type="password" id="password" name="password" required />
         <button type="submit">Login</button>
     </form>
+    <br/>
+    OR
+    <br/>
+    <br/>
+    <div class="register-link">
+        <a th:href="@{/auth/register}">Register</a>
+    </div>
+    <div class="home-link">
+        <a th:href="@{/}">Back to Home</a>
+    </div>
 </div>
 </body>
 </html>

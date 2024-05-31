@@ -56,6 +56,30 @@
             color: red;
             margin-bottom: 10px;
         }
+        .home-link {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        login-link {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .login-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .login-link a:hover {
+            background-color: #218838; /* Darker shade on hover */
+        }
     </style>
 </head>
 <body>
@@ -73,6 +97,16 @@
         <button type="submit">Register</button>
     </form>
     <div th:if="${error}" th:text="${error}" class="error"></div>
+    <br/>
+    OR
+    <br/>
+    <br/>
+    <div class="login-link">
+        <a th:href="@{/auth/login}">Login</a>
+    </div>
+    <div class="home-link">
+        <a th:href="@{/}">Back to Home</a>
+    </div>
 </div>
 </body>
 </html>
