@@ -22,6 +22,13 @@ import java.util.List;
 @Setter
 @ToString
 public class Category {
+    public Category(String name) {
+        this.name = name;
+    }
+
+    public Category() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id = 0L;

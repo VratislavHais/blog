@@ -20,6 +20,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 // can't use @Data as it generates hashCode using fields. This is problematic with usage of Set when fetching from database
@@ -45,6 +46,7 @@ public class Post {
 
     @NotNull(message = "Author cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
+    @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "author_id")
     private User author;
 
@@ -55,13 +57,14 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
 
     @NotNull(message = "Category cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToMany
-    private Set<Comment> comments;
+    private Set<Comment> comments = new HashSet<>();
 }

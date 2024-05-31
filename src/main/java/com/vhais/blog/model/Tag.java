@@ -15,7 +15,8 @@ import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 // can't use @Data as it generates hashCode using fields. This is problematic with usage of Set when fetching from database
 @Entity
@@ -39,5 +40,5 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags")
     @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
-    private Set<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 }
