@@ -129,7 +129,7 @@
 
     <div class="add-comment">
         <h2>Add a Comment</h2>
-        <form th:action="@{/post/{postId}/comments}" th:object="${newComment}" method="post">
+        <form th:action="@{/api/posts/{postId}/comment(postId=${post.id})}" th:object="${newComment}" method="post">
             <label for="author">Name:</label>
             <input type="text" id="author" th:field="*{author}" required />
             <label for="content">Comment:</label>

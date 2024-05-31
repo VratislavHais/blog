@@ -4,7 +4,21 @@ INSERT INTO category (name) VALUES ('Education');
 INSERT INTO category (name) VALUES ('Lifestyle');
 INSERT INTO category (name) VALUES ('Finance');
 
-INSERT INTO user_table (email, username, password, full_name) VALUES ('test@test.cz', 'vhais', 'test', 'Vratislav Hais');
+INSERT INTO role (name) VALUES ('Editor');
+INSERT INTO role (name) VALUES ('Administrator');
+INSERT INTO role (name) VALUES ('Reader');
+
+INSERT INTO user_table (email, username, password, full_name) VALUES (
+    'test@test.cz',
+    'vhais',
+    '$2a$12$X5su42X7E8jAEDe526nMdusjePL/fuA5GxUqQz4UsW.0zhHv/npNm',
+    'Vratislav Hais'
+);
+
+INSERT INTO user_roles (user_id, role_id) VALUES (
+    (SELECT id FROM user_table WHERE username = 'vhais'),
+    (SELECT id FROM role WHERE name = 'Administrator')
+);
 
 INSERT INTO tag (name) VALUES ('first');
 

@@ -85,7 +85,7 @@
 
         <label for="category">Category:</label>
         <select id="category" th:field="*{category}" required>
-            <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"></option>
+            <option th:each="category : ${categories}" th:value="${category.name}" th:text="${category.name}"></option>
         </select>
 
         <button type="submit">Create Post</button>

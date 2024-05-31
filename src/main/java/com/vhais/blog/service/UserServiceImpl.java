@@ -3,8 +3,12 @@ package com.vhais.blog.service;
 import com.vhais.blog.model.User;
 import com.vhais.blog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -20,7 +24,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return repository.findByUsername(username);
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = repository.findByUsername(username);
+        return user.orElseThrow(() -> new UsernameNotFoundException(String.format("User with username %s not found.", username)));
     }
 }

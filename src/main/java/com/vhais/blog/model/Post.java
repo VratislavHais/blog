@@ -25,7 +25,7 @@ import java.util.Set;
 @Table
 @Getter
 @Setter
-@ToString
+//@ToString
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
