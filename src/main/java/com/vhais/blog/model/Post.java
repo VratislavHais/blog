@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,16 +33,17 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id = 0L;
 
-    @NotNull
+    @NotNull(message = "Title cannot be null")
     private String title;
 
-    @NotNull
+    @NotNull(message = "Content cannot be null")
     @Lob
     private String content;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @NotNull(message = "Author cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
@@ -55,6 +57,7 @@ public class Post {
     )
     private Set<Tag> tags;
 
+    @NotNull(message = "Category cannot be null")
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

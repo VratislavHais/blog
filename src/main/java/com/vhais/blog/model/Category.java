@@ -26,7 +26,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id = 0L;
 
-    @NotNull
+    @NotNull(message = "Name cannot be null")
     @Column(unique = true)
     private String name;
 

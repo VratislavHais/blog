@@ -36,16 +36,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id = 0L;
 
-    @Email
-    @NotNull
+    @NotNull(message = "Email cannot be null")
+    @Email(message = "Invalid email address")
     @Column(unique = true)
     private String email;
 
-    @NotNull
+    @NotNull(message = "Username cannot be null")
     @Column(unique = true)
     private String username;
 
-    @NotNull
+    @NotNull(message = "Password cannot be null")
     private String password;
 
     private String fullName;

@@ -26,7 +26,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id = 0L;
 
-    @NotNull
+    @NotNull(message = "Content cannot be null")
     @Lob
     private String content;
 
