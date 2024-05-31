@@ -1,6 +1,5 @@
 package com.vhais.blog.service;
 
-import com.vhais.blog.model.Post;
 import com.vhais.blog.model.Tag;
 import com.vhais.blog.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,7 @@ public class TagServiceImpl implements TagService {
         for (String tagName : tags) {
             Tag tag = getTagByName(tagName).orElse(null);
             if (tag == null) {
-                tag = new Tag(tagName);
-                repository.save(tag);
+                tag = repository.save(new Tag(tagName));
             }
             result.add(tag);
         }

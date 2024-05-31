@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.util.Set;
 
@@ -36,5 +38,6 @@ public class Tag {
     private String name;
 
     @ManyToMany(mappedBy = "tags")
+    @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Post> posts;
 }

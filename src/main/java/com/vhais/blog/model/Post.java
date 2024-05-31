@@ -15,7 +15,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -46,6 +47,7 @@ public class Post {
     private User author;
 
     @ManyToMany
+    @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "post_tags",
             joinColumns = @JoinColumn(name = "post_id"),
