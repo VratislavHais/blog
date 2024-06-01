@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/post")
 @RequiredArgsConstructor
 public class PostController {
+    private static final String HOME = "/home";
+
     private final PostService postService;
     private final CategoryService categoryService;
     private final TagService tagService;
@@ -47,7 +49,7 @@ public class PostController {
             newPost.setUpdatedAt(LocalDateTime.now());
             newPost.setTitle(post.getTitle());
             postService.savePost(newPost);
-            return "redirect:/";
+            return "redirect:" + HOME;
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("post", post);
@@ -79,7 +81,7 @@ public class PostController {
             return "viewPost";
         } catch (NumberFormatException e) {
             model.addAttribute("error", e.getMessage());
-            return "redirect:/";
+            return "redirect:" + HOME;
         }
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title>Home</title>
     <style>
@@ -82,10 +82,17 @@
 <header>
     <h1>Blog Posts</h1>
 </header>
-<nav>
-    <a href="/auth/login" class="button">Login</a>
-    <a href="/auth/register" class="button">Register</a>
-</nav>
+<div sec:authorize="!isAuthenticated()">
+    <nav>
+        <a href="/auth/login" class="button">Login</a>
+        <a href="/auth/register" class="button">Register</a>
+    </nav>
+</div>
+<div sec:authorize="isAuthenticated()">
+    <nav>
+        <a href="/auth/logout" class="button">Logout</a>
+    </nav>
+</div>
 <div class="container">
     <ul>
         <li th:each="post : ${posts}">
