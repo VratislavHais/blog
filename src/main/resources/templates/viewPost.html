@@ -19,32 +19,99 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 800px;
+            position: relative;
         }
         h1 {
             margin-bottom: 20px;
+            text-align: center;
         }
-        .author {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .info {
+        .details {
             margin-bottom: 20px;
             font-size: 14px;
             color: #999;
+            text-align: left;
+        }
+        .details span {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .details span:first-child {
+            margin-right: 20px;
+        }
+        .tags-container {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tags-container:hover {
+            background-color: rgba(0, 0, 0, 0.1);
         }
         .tags {
-            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .tags span {
-            margin-right: 10px;
-            background-color: #007bff;
-            color: #fff;
+        .tags a {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #333;
             padding: 5px 10px;
             border-radius: 5px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .tags a:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        .tags a .delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            color: rgba(0, 0, 0, 0.3);
+            background-color: transparent;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            width: 12px;
+            height: 12px;
+            line-height: 12px;
+        }
+        .tags a:hover .delete-btn {
+            display: inline-flex;
+        }
+        .tags-editor {
+            display: none;
+            flex-grow: 1;
+        }
+        .tags-editor input {
+            border-radius: 0px;
+            border: 4px solid transparent;
+            outline: 0;
+            font-size: 14px;
+            background-color: transparent;
+            margin-left: 10px;
+            flex-grow: 1;
+            display: none;
         }
         .content {
             margin-bottom: 40px;
             line-height: 1.6;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fafafa;
         }
         .comments-section {
             margin-top: 40px;
@@ -104,19 +171,63 @@
             text-decoration: underline;
         }
     </style>
+    <script>
+        function toggleTagsEditor(event) {
+            event.stopPropagation();
+            document.querySelector('.tags-editor input').style.display = 'block';
+            document.querySelector('.tags-editor').style.display = 'flex';
+            document.querySelector('.tags-container').style.backgroundColor = "#0000001a";
+            document.querySelector('.tags-editor input').focus();
+        }
+
+        function hideTagsEditor() {
+            document.querySelector('.tags-editor input').style.display = 'none';
+            document.querySelector('.tags-editor').style.display = 'none';
+            document.querySelector('.tags-container').style.backgroundColor = "#00000000";
+        }
+
+        function submitTag(event, postId) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = event.target;
+                const newTag = input.value.trim();
+                if (newTag) {
+                    const form = document.querySelector('.tags-editor form');
+                    form.submit();
+                }
+            }
+        }
+
+        document.addEventListener('click', hideTagsEditor);
+    </script>
 </head>
 <body>
 <div class="container">
     <h1 th:text="${post.title}"></h1>
-    <p class="author">By: <span th:text="${post.author.fullName}"></span></p>
-    <p class="info">Created At: <span th:text="${post.createdAt}"></span></p>
-    <p class="info">Updated At: <span th:text="${post.updatedAt}"></span></p>
-    <p class="info">Category: <span th:text="${post.category.name}"></span></p>
-    <div class="tags">
-        <span th:each="tag : ${post.tags}" th:text="${tag.name}"></span>
+    <div class="details">
+        <span>By: <span th:text="${post.author.fullName}"></span></span>
+        <br/>
+        <span>Created At: <span th:text="${post.createdAt}"></span></span>
+        <br/>
+        <span>Updated At: <span th:text="${post.updatedAt}"></span></span>
+        <br/>
+        <span>Category: <span th:text="${post.category.name}"></span></span>
     </div>
     <div class="content">
         <p th:text="${post.content}"></p>
+    </div>
+    <div class="tags-container" onclick="toggleTagsEditor(event)">
+        <div class="tags">
+            <a th:each="tag : ${post.tags}" th:href="@{/post/{postId}/tags/{tagId}/delete(postId=${post.id},tagId=${tag.id})}">
+                <span th:text="${tag.name}"></span>
+                <span class="delete-btn">✖</span>
+            </a>
+        </div>
+        <div class="tags-editor">
+            <form th:action="@{/post/{postId}/tags/add(postId=${post.id})}" method="post">
+                <input type="text" name="newTag" onkeydown="submitTag(event, [[${post.id}]])" />
+            </form>
+        </div>
     </div>
 
     <div class="comments-section">

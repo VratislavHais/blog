@@ -10,5 +10,6 @@ public interface TagService {
     Tag saveTag(Tag tag);
     Set<Tag> saveAllTags(Set<String> tagNames);
     Optional<Tag> getTagByName(String name);
+    Optional<Tag> getTagById(Long id);
     List<Tag> getAllTags();
 }
