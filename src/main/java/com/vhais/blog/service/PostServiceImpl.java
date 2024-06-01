@@ -8,12 +8,16 @@ import com.vhais.blog.repository.CategoryRepository;
 import com.vhais.blog.repository.PostRepository;
 import com.vhais.blog.repository.TagRepository;
 import com.vhais.blog.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +40,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private void updateListOfCategory(Post post) {
-        Category category = categoryRepository.findById(post.getCategory().getId()).orElseThrow(() -> new IllegalArgumentException("Category " + post.getCategory().getName() + " does not exist"));
+        Category category = categoryRepository.findById(post.getCategory().getId()).orElseThrow(() -> new EntityNotFoundException("Category " + post.getCategory().getName() + " does not exist"));
         List<Post> categoryPosts = category.getPosts();
         categoryPosts.add(post);
         category.setPosts(categoryPosts);
@@ -44,7 +48,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private void updateListOfUser(Post post) {
-        User user = userRepository.findById(post.getAuthor().getId()).orElseThrow(() -> new IllegalArgumentException("User with username " + post.getAuthor().getUsername() + " not found"));
+        User user = userRepository.findById(post.getAuthor().getId()).orElseThrow(() -> new EntityNotFoundException("User with username " + post.getAuthor().getUsername() + " not found"));
         List<Post> userPosts = user.getPosts();
         userPosts.add(post);
         user.setPosts(userPosts);
@@ -59,7 +63,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private void updateListOfTag(Post post, Tag tag) {
-        Tag fetchedTag = tagRepository.findById(tag.getId()).orElseThrow(() -> new IllegalArgumentException("Tag with name " + tag.getName() + " not found"));
+        Tag fetchedTag = tagRepository.findById(tag.getId()).orElseThrow(() -> new EntityNotFoundException("Tag with name " + tag.getName() + " not found"));
         List<Post> tagPosts = fetchedTag.getPosts();
         tagPosts.add(post);
         fetchedTag.setPosts(tagPosts);
@@ -72,13 +76,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPostsByCategory(Category category) {
-        return postRepository.findByCategory(category);
+    public List<Post> getPostsByCategoryName(String categoryName) {
+        return postRepository.findByCategory_Name(categoryName);
     }
 
     @Override
-    public List<Post> getPostsByAuthor(User user) {
-        return postRepository.findByAuthor(user);
+    public List<Post> getPostsByAuthorUsername(String username) {
+        return postRepository.findByAuthor_Username(username);
     }
 
     @Override
@@ -87,14 +91,51 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Transactional
     public Post getPostById(Long id) {
-        return postRepository.getReferenceById(id);
+        return postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
     }
 
     @Override
-    public Post getPostById(String id) throws NumberFormatException {
-        Long idLong = Long.parseLong(id);
-        return getPostById(idLong);
+    public Post removeTagFromPost(String tagName, Post post) {
+        Tag tag = tagRepository.findByName(tagName).orElseThrow(() -> new EntityNotFoundException("Tag " + tagName + " not found"));
+
+        return removeTagFromPost(tag, post);
+    }
+
+    @Override
+    public Post removeTagFromPost(Tag tag, Post post) {
+        List<Post> posts = tag.getPosts();
+        posts.remove(post);
+        tag.setPosts(posts);
+        tagRepository.save(tag);
+
+        Set<Tag> tags = post.getTags();
+        tags.remove(tag);
+        post.setTags(tags);
+        return postRepository.save(post);
+    }
+
+    @Override
+    public Post addTagsToPost(Post post, String... tagNames) {
+        Set<Tag> tags = new HashSet<>();
+        for (String tagName : tagNames) {
+            tags.addAll(
+                    Arrays.stream(tagName.split(" "))
+                            .map(name -> tagRepository.findByName(name).orElse(tagRepository.save(new Tag(name))))
+                            .collect(Collectors.toSet())
+            );
+        }
+        return addTagsToPost(post, tags.toArray(Tag[]::new));
+    }
+
+    @Override
+    public Post addTagsToPost(Post post, Tag... tags) {
+        Set<Tag> postTags = post.getTags();
+        for (Tag tag : tags) {
+            updateListOfTag(post, tag);
+            postTags.add(tag);
+        }
+        post.setTags(postTags);
+        return postRepository.save(post);
     }
 }

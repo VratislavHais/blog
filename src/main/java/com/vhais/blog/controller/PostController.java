@@ -8,6 +8,7 @@ import com.vhais.blog.model.User;
 import com.vhais.blog.service.CategoryService;
 import com.vhais.blog.service.PostService;
 import com.vhais.blog.service.TagService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,7 +44,7 @@ public class PostController {
             newPost.setAuthor((User) auth.getPrincipal());
             Set<Tag> tags = tagService.saveAllTags(parseTagField(post.getTags()));
             newPost.setTags(tags);
-            newPost.setCategory(categoryService.getCategoryByName(post.getCategory()).orElseThrow(() -> new IllegalArgumentException("Category " + post.getCategory() + " not found")));
+            newPost.setCategory(categoryService.getCategoryByName(post.getCategory()).orElseThrow(() -> new EntityNotFoundException("Category " + post.getCategory() + " not found")));
             newPost.setContent(post.getContent());
             newPost.setCreatedAt(LocalDateTime.now());
             newPost.setUpdatedAt(LocalDateTime.now());
@@ -73,13 +74,13 @@ public class PostController {
     }
 
     @GetMapping("{id}")
-    public String displayPost(@PathVariable String id, Model model) {
+    public String displayPost(@PathVariable Long id, Model model) {
         try {
             Post post = postService.getPostById(id);
             model.addAttribute("post", post);
             model.addAttribute("newComment", new Comment());
             return "viewPost";
-        } catch (NumberFormatException e) {
+        } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
             return "redirect:" + HOME;
         }
