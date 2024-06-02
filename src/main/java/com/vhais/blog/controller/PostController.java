@@ -10,7 +10,6 @@ import com.vhais.blog.service.PostService;
 import com.vhais.blog.service.TagService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDateTime;
@@ -86,22 +84,5 @@ public class PostController {
             model.addAttribute("error", e.getMessage());
             return "redirect:" + HOME;
         }
-    }
-
-    @GetMapping("/{id}/tags/{tagId}/delete")
-    public String deleteTagFromPost(@PathVariable("id") Long postId,
-                                    @PathVariable("tagId") Long tagId) {
-        Post post = postService.getPostById(postId);
-        Tag tag = tagService.getTagById(tagId).orElseThrow(() -> new EntityNotFoundException("Tag with id " + tagId + " not found"));
-        postService.removeTagFromPost(tag, post);
-        return "redirect:/post/" + postId;
-    }
-
-    @PostMapping("/{id}/tags/add")
-    public String addTagsToPost(@PathVariable("id") Long postId,
-                                @RequestBody String tags) {
-        Post post = postService.getPostById(postId);
-        postService.addTagsToPost(post, StringUtils.substringAfter(tags, "=").split("\\+"));
-        return "redirect:/post/" + postId;
     }
 }

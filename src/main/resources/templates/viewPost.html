@@ -218,13 +218,13 @@
     </div>
     <div class="tags-container" onclick="toggleTagsEditor(event)">
         <div class="tags">
-            <a th:each="tag : ${post.tags}" th:href="@{/post/{postId}/tags/{tagId}/delete(postId=${post.id},tagId=${tag.id})}">
+            <a th:each="tag : ${post.tags}" th:href="@{/api/post/{postId}/tags/{tagId}/delete(postId=${post.id},tagId=${tag.id})}">
                 <span th:text="${tag.name}"></span>
                 <span class="delete-btn">✖</span>
             </a>
         </div>
         <div class="tags-editor">
-            <form th:action="@{/post/{postId}/tags/add(postId=${post.id})}" method="post">
+            <form th:action="@{/api/post/{postId}/tags/add(postId=${post.id})}" method="post">
                 <input type="text" name="newTag" onkeydown="submitTag(event, [[${post.id}]])" />
             </form>
         </div>

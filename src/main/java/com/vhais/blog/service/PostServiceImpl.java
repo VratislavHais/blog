@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -93,49 +94,5 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
-    }
-
-    @Override
-    public Post removeTagFromPost(String tagName, Post post) {
-        Tag tag = tagRepository.findByName(tagName).orElseThrow(() -> new EntityNotFoundException("Tag " + tagName + " not found"));
-
-        return removeTagFromPost(tag, post);
-    }
-
-    @Override
-    public Post removeTagFromPost(Tag tag, Post post) {
-        List<Post> posts = tag.getPosts();
-        posts.remove(post);
-        tag.setPosts(posts);
-        tagRepository.save(tag);
-
-        Set<Tag> tags = post.getTags();
-        tags.remove(tag);
-        post.setTags(tags);
-        return postRepository.save(post);
-    }
-
-    @Override
-    public Post addTagsToPost(Post post, String... tagNames) {
-        Set<Tag> tags = new HashSet<>();
-        for (String tagName : tagNames) {
-            tags.addAll(
-                    Arrays.stream(tagName.split(" "))
-                            .map(name -> tagRepository.findByName(name).orElse(tagRepository.save(new Tag(name))))
-                            .collect(Collectors.toSet())
-            );
-        }
-        return addTagsToPost(post, tags.toArray(Tag[]::new));
-    }
-
-    @Override
-    public Post addTagsToPost(Post post, Tag... tags) {
-        Set<Tag> postTags = post.getTags();
-        for (Tag tag : tags) {
-            updateListOfTag(post, tag);
-            postTags.add(tag);
-        }
-        post.setTags(postTags);
-        return postRepository.save(post);
     }
 }

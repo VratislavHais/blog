@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -210,61 +209,6 @@ public class PostServiceIT {
         // only global post should be present
         assertThat(postsTag2).hasSize(1);
         assertThat(postsTag2).containsOnly(post);
-    }
-
-    @Test
-    public void testRemovingTagFromPost() {
-        postService.removeTagFromPost(tag1.getName(), post);
-
-        Post retrievedPost = postService.getPostById(post.getId());
-        assertThat(retrievedPost.getTags()).doesNotContain(tag1);
-        assertThat(retrievedPost.getTags()).contains(tag2);
-
-        Tag retrievedTag = tagRepository.findById(tag1.getId()).get();
-        assertThat(retrievedTag.getPosts()).doesNotContain(post);
-    }
-
-    @Test
-    public void testAddingNewTagToPostByName() {
-        String tagName = "newTagName";
-        post = postService.addTagsToPost(post, tagName);
-
-        Optional<Tag> retrievedTag = tagRepository.findByName(tagName);
-        assertThat(retrievedTag).isNotEmpty();
-        assertThat(retrievedTag.get().getName()).isEqualTo(tagName);
-        assertThat(retrievedTag.get().getPosts()).contains(post);
-
-        assertThat(post.getTags()).contains(retrievedTag.get());
-    }
-
-    @Test
-    public void testAddingNewTagsToPostByNamePassedAsArray() {
-        String[] tagNames = new String[]{"newTagName", "anotherTagName"};
-        post = postService.addTagsToPost(post, tagNames);
-
-        for (String tagName : tagNames) {
-            Optional<Tag> retrievedTag = tagRepository.findByName(tagName);
-            assertThat(retrievedTag).isNotEmpty();
-            assertThat(retrievedTag.get().getName()).isEqualTo(tagName);
-            assertThat(retrievedTag.get().getPosts()).contains(post);
-
-            assertThat(post.getTags()).contains(retrievedTag.get());
-        }
-    }
-
-    @Test
-    public void testAddingNewTagsToPostPassedAsSpaceSeparatedValues() {
-        String tagNames = "newTagName anotherTagName";
-        post = postService.addTagsToPost(post, tagNames);
-
-        for (String tagName : tagNames.split(" ")) {
-            Optional<Tag> retrievedTag = tagRepository.findByName(tagName);
-            assertThat(retrievedTag).isNotEmpty();
-            assertThat(retrievedTag.get().getName()).isEqualTo(tagName);
-            assertThat(retrievedTag.get().getPosts()).contains(post);
-
-            assertThat(post.getTags()).contains(retrievedTag.get());
-        }
     }
 
     private List<Post> createMultiplePosts(int n, Tag... tags) {
