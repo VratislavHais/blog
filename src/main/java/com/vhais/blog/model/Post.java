@@ -19,7 +19,9 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 // can't use @Data as it generates hashCode using fields. This is problematic with usage of Set when fetching from database
@@ -65,5 +67,5 @@ public class Post {
     private Category category;
 
     @OneToMany
-    private Set<Comment> comments = new HashSet<>();
+    private List<Comment> comments = new ArrayList<>();
 }

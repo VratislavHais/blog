@@ -62,6 +62,9 @@ public class User implements UserDetails {
     )
     private List<Role> roles = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Comment> comments = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

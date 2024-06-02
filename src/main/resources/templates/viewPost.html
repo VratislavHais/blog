@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title th:text="${post.title}">Post</title>
     <style>
@@ -234,15 +234,13 @@
         <h2>Comments</h2>
         <div th:each="comment : ${post.comments}" class="comment">
             <p th:text="${comment.content}"></p>
-            <p><strong th:text="${comment.authorName}"></strong></p>
+            <p><strong th:text="${comment.author.username}"></strong></p>
         </div>
     </div>
 
-    <div class="add-comment">
+    <div class="add-comment" sec:authorize="isAuthenticated()">
         <h2>Add a Comment</h2>
         <form th:action="@{/api/posts/{postId}/comment(postId=${post.id})}" th:object="${newComment}" method="post">
-            <label for="author">Name:</label>
-            <input type="text" id="author" th:field="*{author}" required />
             <label for="content">Comment:</label>
             <textarea id="content" th:field="*{content}" rows="5" required></textarea>
             <button type="submit">Add Comment</button>

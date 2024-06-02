@@ -13,6 +13,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +39,7 @@ public class Comment {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "author_id")
     private User author;
 }

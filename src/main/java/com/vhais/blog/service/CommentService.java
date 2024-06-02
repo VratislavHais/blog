@@ -7,7 +7,7 @@ import com.vhais.blog.model.User;
 import java.util.List;
 
 public interface CommentService {
-    Comment saveComment(Comment comment);
+    Comment saveComment(Comment comment, Post post, User user);
     List<Comment> getCommentsByPost(Post post);
     List<Comment> getCommentsByAuthor(User user);
 }
