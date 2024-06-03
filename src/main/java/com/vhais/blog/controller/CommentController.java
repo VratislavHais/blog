@@ -9,13 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/api/posts")
@@ -26,14 +23,10 @@ public class CommentController {
 
     @PostMapping("/{postId}/comment")
     public String postComment(@PathVariable("postId") Long postId,
-                              @ModelAttribute Comment comment,
-                              Model model) {
-        comment.setCreatedAt(LocalDateTime.now());
+                              @ModelAttribute Comment comment) {
         Post post = postService.getPostById(postId);
-        comment.setPost(post);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
-        comment.setAuthor(user);
         commentService.saveComment(comment, post, user);
         return "redirect:/post/" + postId;
     }

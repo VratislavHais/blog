@@ -30,7 +30,7 @@ public class TagServiceImpl implements TagService {
     public Set<Tag> saveAllTags(Set<String> tags) {
         Set<Tag> result = new HashSet<>();
         for (String tagName : tags) {
-            Tag tag = getTagByName(tagName).orElseGet(null);
+            Tag tag = getTagByName(tagName).orElse(null);
             if (tag == null) {
                 tag = tagRepository.save(new Tag(tagName));
             }
