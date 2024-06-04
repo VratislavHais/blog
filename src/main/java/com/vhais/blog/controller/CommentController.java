@@ -1,13 +1,9 @@
 package com.vhais.blog.controller;
 
-import com.vhais.blog.model.Comment;
-import com.vhais.blog.model.Post;
-import com.vhais.blog.model.User;
+import com.vhais.blog.dto.CommentDTO;
 import com.vhais.blog.service.CommentService;
 import com.vhais.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,11 +19,8 @@ public class CommentController {
 
     @PostMapping("/{postId}/comment")
     public String postComment(@PathVariable("postId") Long postId,
-                              @ModelAttribute Comment comment) {
-        Post post = postService.getPostById(postId);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
-        commentService.saveComment(comment, post, user);
+                              @ModelAttribute CommentDTO commentDTO) {
+        commentService.saveCommentUnderPost(commentDTO, postId);
         return "redirect:/post/" + postId;
     }
 }

@@ -1,5 +1,6 @@
 package com.vhais.blog.service;
 
+import com.vhais.blog.dto.CommentDTO;
 import com.vhais.blog.model.Category;
 import com.vhais.blog.model.Comment;
 import com.vhais.blog.model.Post;
@@ -13,12 +14,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 @Tag("integration")
 public class CommentServiceIT {
     @Autowired
@@ -60,36 +66,48 @@ public class CommentServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "test")
     public void testCommentIncludedInUserList() {
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setAuthor(user);
-        comment.setContent("test");
-        comment = commentService.saveComment(comment, post, user);
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setContent("test");
+        Comment comment = commentService.saveCommentUnderPost(commentDTO, post.getId());
 
-        assertThat(user.getComments()).contains(comment);
+        User fetched = userRepository.findById(user.getId()).get();
+        assertThat(fetched.getComments()).contains(comment);
     }
 
     @Test
+    @WithMockUser(username = "test")
     public void testCommentIncludedInPostList() {
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setAuthor(user);
-        comment.setContent("test");
-        comment = commentService.saveComment(comment, post, user);
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setContent("test");
+        Comment comment = commentService.saveCommentUnderPost(commentDTO, post.getId());
 
-        assertThat(post.getComments()).contains(comment);
+        Post fetched = postRepository.findById(post.getId()).get();
+        assertThat(fetched.getComments()).contains(comment);
     }
 
     @Test
-    public void testCommandRemovedFromUserAndPostLists() {
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setAuthor(user);
-        comment.setContent("test");
-        comment = commentService.saveComment(comment, post, user);
+    @WithMockUser(username = "test")
+    public void testCommentStoredWithAllData() {
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setContent("test");
+        Comment comment = commentService.saveCommentUnderPost(commentDTO, post.getId());
 
-        commentService.deleteComment(comment, post, user);
+        assertThat(comment.getAuthor()).isEqualTo(user);
+        assertThat(comment.getPost()).isEqualTo(post);
+        assertThat(comment.getContent()).isEqualTo("test");
+        assertThat(comment.getCreatedAt()).hasMinute(LocalDateTime.now().getMinute());
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    public void testCommandRemovedFromUserAndPostLists() {
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setContent("test");
+        Comment comment = commentService.saveCommentUnderPost(commentDTO, post.getId());
+
+        commentService.deleteComment(comment.getId(), post.getId(), user.getUsername());
 
         user = userRepository.findById(user.getId()).get();
         assertThat(user.getComments()).doesNotContain(comment);

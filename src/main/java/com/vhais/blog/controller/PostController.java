@@ -1,5 +1,6 @@
 package com.vhais.blog.controller;
 
+import com.vhais.blog.dto.CommentDTO;
 import com.vhais.blog.dto.PostDTO;
 import com.vhais.blog.model.Comment;
 import com.vhais.blog.model.Post;
@@ -49,7 +50,7 @@ public class PostController {
         try {
             Post post = postService.getPostById(id);
             model.addAttribute("post", post);
-            model.addAttribute("newComment", new Comment());
+            model.addAttribute("newComment", new CommentDTO());
             return "viewPost";
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
