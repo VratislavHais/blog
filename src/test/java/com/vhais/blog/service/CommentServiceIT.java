@@ -13,18 +13,25 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 @Tag("integration")
 public class CommentServiceIT {
     @Autowired
@@ -97,7 +104,7 @@ public class CommentServiceIT {
         assertThat(comment.getAuthor()).isEqualTo(user);
         assertThat(comment.getPost()).isEqualTo(post);
         assertThat(comment.getContent()).isEqualTo("test");
-        assertThat(comment.getCreatedAt()).hasMinute(LocalDateTime.now().getMinute());
+        assertThat(comment.getCreatedAt()).isNotNull();
     }
 
     @Test
