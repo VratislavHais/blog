@@ -34,6 +34,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Post savePost(PostDTO postDTO) {
         Post post = new Post();
+
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
         User user = retrieveAuthor();
@@ -64,37 +65,6 @@ public class PostServiceImpl implements PostService {
             return Arrays.stream(tags.split(" ")).collect(Collectors.toSet());
         }
         return new HashSet<>();
-    }
-
-    private void updateListOfCategory(Post post) {
-        Category category = categoryRepository.findById(post.getCategory().getId()).orElseThrow(() -> new EntityNotFoundException("Category " + post.getCategory().getName() + " does not exist"));
-        List<Post> categoryPosts = category.getPosts();
-        categoryPosts.add(post);
-        category.setPosts(categoryPosts);
-        categoryRepository.save(category);
-    }
-
-    private void updateListOfUser(Post post) {
-        User user = userRepository.findById(post.getAuthor().getId()).orElseThrow(() -> new EntityNotFoundException("User with username " + post.getAuthor().getUsername() + " not found"));
-        List<Post> userPosts = user.getPosts();
-        userPosts.add(post);
-        user.setPosts(userPosts);
-        userRepository.save(user);
-    }
-
-    private void updateListOfTags(Post post) {
-        // need to create new HashSet due to concurrency issue
-        for (Tag tag : new HashSet<>(post.getTags())) {
-            updateListOfTag(post, tag);
-        }
-    }
-
-    private void updateListOfTag(Post post, Tag tag) {
-        Tag fetchedTag = tagService.getTagById(tag.getId()).orElseThrow(() -> new EntityNotFoundException("Tag with name " + tag.getName() + " not found"));
-        List<Post> tagPosts = fetchedTag.getPosts();
-        tagPosts.add(post);
-        fetchedTag.setPosts(tagPosts);
-        tagService.saveTag(fetchedTag);
     }
 
     @Override

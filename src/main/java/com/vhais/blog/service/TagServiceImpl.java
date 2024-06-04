@@ -5,6 +5,7 @@ import com.vhais.blog.model.Tag;
 import com.vhais.blog.repository.PostRepository;
 import com.vhais.blog.repository.TagRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -55,54 +56,25 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Post removeTagFromPost(String tagName, Post post) {
-        Tag tag = tagRepository.findByName(tagName).orElseThrow(() -> new EntityNotFoundException("Tag " + tagName + " not found"));
-
-        return removeTagFromPost(tag, post);
+    @Transactional
+    public void removeTagFromPost(Long tagId, Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post with id " + postId + " not found"));
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new EntityNotFoundException("Tag " + tagId + " not found"));
+        tag.removePost(post);
+        post.removeTag(tag);
     }
 
     @Override
-    public Post removeTagFromPost(Tag tag, Post post) {
-        List<Post> posts = tag.getPosts();
-        posts.remove(post);
-        tag.setPosts(posts);
-        tagRepository.save(tag);
-
-        Set<Tag> tags = post.getTags();
-        tags.remove(tag);
-        post.setTags(tags);
-        return postRepository.save(post);
-    }
-
-    @Override
-    public Post addTagsToPost(Post post, String... tagNames) {
-        Set<Tag> tags = new HashSet<>();
+    @Transactional
+    public void addTagsToPost(Long postId, String... tagNames) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post with id " + postId + " not found"));
         for (String tagName : tagNames) {
-            tags.addAll(
-                    Arrays.stream(tagName.split(" "))
-                            .map(name -> tagRepository.findByName(name).orElseGet(() -> tagRepository.save(new Tag(name))))
-                            .collect(Collectors.toSet())
-            );
+                Arrays.stream(tagName.split(" "))
+                        .map(name -> tagRepository.findByName(name).orElseGet(() -> tagRepository.save(new Tag(name))))
+                        .forEach(tag -> {
+                            tag.addPost(post);
+                            post.addTag(tag);
+                        });
         }
-        return addTagsToPost(post, tags.toArray(Tag[]::new));
-    }
-
-    @Override
-    public Post addTagsToPost(Post post, Tag... tags) {
-        Set<Tag> postTags = post.getTags();
-        for (Tag tag : tags) {
-            updateListsOfPostAndTag(post, tag);
-            postTags.add(tag);
-        }
-        post.setTags(postTags);
-        return postRepository.save(post);
-    }
-
-    private void updateListsOfPostAndTag(Post post, Tag tag) {
-        Tag fetchedTag = tagRepository.findById(tag.getId()).orElseThrow(() -> new EntityNotFoundException("Tag with name " + tag.getName() + " not found"));
-        List<Post> tagPosts = fetchedTag.getPosts();
-        tagPosts.add(post);
-        fetchedTag.setPosts(tagPosts);
-        tagRepository.save(fetchedTag);
     }
 }
