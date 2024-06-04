@@ -41,4 +41,12 @@ public class Tag {
     @ManyToMany(mappedBy = "tags")
     @Cascade({CascadeType.MERGE, CascadeType.PERSIST})
     private List<Post> posts = new ArrayList<>();
+
+    public void addPost(Post post) {
+        posts.add(post);
+    }
+
+    public void removePost(Post post) {
+        posts.remove(post);
+    }
 }

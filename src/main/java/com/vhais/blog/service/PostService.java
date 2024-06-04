@@ -1,12 +1,13 @@
 package com.vhais.blog.service;
 
+import com.vhais.blog.dto.PostDTO;
 import com.vhais.blog.model.Post;
 import com.vhais.blog.model.Tag;
 
 import java.util.List;
 
 public interface PostService {
-    Post savePost(Post post);
+    Post savePost(PostDTO post);
     List<Post> getAllPosts();
     List<Post> getPostsByCategoryName(String categoryName);
     List<Post> getPostsByAuthorUsername(String username);

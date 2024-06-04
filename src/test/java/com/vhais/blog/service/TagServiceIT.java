@@ -12,7 +12,9 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 @org.junit.jupiter.api.Tag("integration")
 public class TagServiceIT {
     @Autowired
@@ -74,8 +77,9 @@ public class TagServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "test")
     public void testRemovingTagFromPost() {
-        tagService.removeTagFromPost(tag1.getName(), post);
+        tagService.removeTagFromPost(tag1.getId(), post.getId());
 
         Post retrievedPost = postRepository.findById(post.getId()).get();
         assertThat(retrievedPost.getTags()).doesNotContain(tag1);
@@ -86,10 +90,12 @@ public class TagServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "test")
     public void testAddingNewTagToPostByName() {
         String tagName = "newTagName";
-        post = tagService.addTagsToPost(post, tagName);
+        tagService.addTagsToPost(post.getId(), tagName);
 
+        post = postRepository.findById(post.getId()).get();
         Optional<Tag> retrievedTag = tagRepository.findByName(tagName);
         assertThat(retrievedTag).isNotEmpty();
         assertThat(retrievedTag.get().getName()).isEqualTo(tagName);
@@ -99,9 +105,12 @@ public class TagServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "test")
     public void testAddingNewTagsToPostByNamePassedAsArray() {
         String[] tagNames = new String[]{"newTagName", "anotherTagName"};
-        post = tagService.addTagsToPost(post, tagNames);
+        tagService.addTagsToPost(post.getId(), tagNames);
+
+        post = postRepository.findById(post.getId()).get();
 
         for (String tagName : tagNames) {
             Optional<Tag> retrievedTag = tagRepository.findByName(tagName);
@@ -114,9 +123,12 @@ public class TagServiceIT {
     }
 
     @Test
+    @WithMockUser(username = "test")
     public void testAddingNewTagsToPostPassedAsSpaceSeparatedValues() {
         String tagNames = "newTagName anotherTagName";
-        post = tagService.addTagsToPost(post, tagNames);
+        tagService.addTagsToPost(post.getId(), tagNames);
+
+        post = postRepository.findById(post.getId()).get();
 
         for (String tagName : tagNames.split(" ")) {
             Optional<Tag> retrievedTag = tagRepository.findByName(tagName);
