@@ -1,6 +1,7 @@
 package com.vhais.blog.service;
 
 import com.vhais.blog.dto.PostDTO;
+import com.vhais.blog.dto.ResponsePostDTO;
 import com.vhais.blog.model.Post;
 import com.vhais.blog.model.Tag;
 
@@ -13,4 +14,6 @@ public interface PostService {
     List<Post> getPostsByAuthorUsername(String username);
     List<Post> getPostsByTagName(String tagName);
     Post getPostById(Long id);
+    ResponsePostDTO getPostForEditing(Long id);
+    Post editPost(Long id, PostDTO postDTO);
 }

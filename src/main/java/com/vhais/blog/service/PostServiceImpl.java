@@ -1,6 +1,7 @@
 package com.vhais.blog.service;
 
 import com.vhais.blog.dto.PostDTO;
+import com.vhais.blog.dto.ResponsePostDTO;
 import com.vhais.blog.model.Category;
 import com.vhais.blog.model.Post;
 import com.vhais.blog.model.Tag;
@@ -87,5 +88,32 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
+    }
+
+    @Override
+    public ResponsePostDTO getPostForEditing(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
+        ResponsePostDTO response = new ResponsePostDTO();
+        response.setId(post.getId());
+        response.setCategory(post.getCategory().getName());
+        response.setContent(post.getContent());
+        response.setTitle(post.getTitle());
+        response.setTags(post.getTags().stream().map(Tag::getName).reduce("", (a, b) -> a + " " + b).trim());
+        return response;
+    }
+
+    @Override
+    public Post editPost(Long id, PostDTO postDTO) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
+
+        post.setUpdatedAt(LocalDateTime.now());
+        Set<Tag> tags = tagService.saveAllTags(parseTagField(postDTO.getTags()));
+        post.setTags(tags);
+        Category category = categoryRepository.findByName(postDTO.getCategory()).orElseThrow(() -> new EntityNotFoundException("Category " + postDTO.getCategory() + " not found"));
+        post.setCategory(category);
+        post.setContent(postDTO.getContent());
+        post.setTitle(postDTO.getTitle());
+
+        return postRepository.save(post);
     }
 }

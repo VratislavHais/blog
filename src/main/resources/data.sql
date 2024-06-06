@@ -4,9 +4,8 @@ INSERT INTO category (name) VALUES ('Education');
 INSERT INTO category (name) VALUES ('Lifestyle');
 INSERT INTO category (name) VALUES ('Finance');
 
-INSERT INTO role (name) VALUES ('Editor');
+INSERT INTO role (name) VALUES ('User');
 INSERT INTO role (name) VALUES ('Administrator');
-INSERT INTO role (name) VALUES ('Reader');
 
 INSERT INTO user_table (email, username, password, full_name) VALUES (
     'test@test.cz',
