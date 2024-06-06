@@ -6,6 +6,7 @@ import com.vhais.blog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,14 +38,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof User));
+        return (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof UserDetails));
     }
 
     @Override
     public Optional<User> getAuthenticatedUser() {
         Optional<User> result = Optional.empty();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof User) {
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
             result = repository.findByUsername(authentication.getName());
         }
         return result;
