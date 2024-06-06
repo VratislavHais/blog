@@ -23,7 +23,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public Comment saveComment(Comment comment) {
@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post with id " + postId + " not found"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User author = userRepository.findByUsername(authentication.getName()).get();
+        User author = userService.getAuthenticatedUser().orElseThrow();
 
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
@@ -57,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Long commentId, Long postId, String username) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post with id " + postId + " not found"));
-        User author = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User with id " + postId + " not found"));
+        User author = userService.loadUserByUsername(username);
         post.removeComment(comment);
         author.removeComment(comment);
 

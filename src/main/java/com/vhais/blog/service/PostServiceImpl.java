@@ -11,8 +11,10 @@ import com.vhais.blog.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final TagService tagService;
 
     @Override
@@ -37,7 +39,7 @@ public class PostServiceImpl implements PostService {
 
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
-        User user = retrieveAuthor();
+        User user = userService.getAuthenticatedUser().orElseThrow();
         post.setAuthor(user);
         Set<Tag> tags = tagService.saveAllTags(parseTagField(postDTO.getTags()));
         post.setTags(tags);
@@ -53,11 +55,6 @@ public class PostServiceImpl implements PostService {
         tags.forEach(tag -> tag.addPost(savedPost));
 
         return savedPost;
-    }
-
-    private User retrieveAuthor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByUsername(authentication.getName()).orElseThrow();
     }
 
     private Set<String> parseTagField(String tags) {
