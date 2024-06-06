@@ -1,11 +1,8 @@
 package com.vhais.blog.controller;
 
 import com.vhais.blog.dto.UserDTO;
-import com.vhais.blog.model.User;
 import com.vhais.blog.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +30,7 @@ public class UserController {
             return "redirect:" + LOGIN_FULL;
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("user", userDTO);
             return REGISTER;
         }
     }
