@@ -4,19 +4,20 @@ INSERT INTO category (name) VALUES ('Education');
 INSERT INTO category (name) VALUES ('Lifestyle');
 INSERT INTO category (name) VALUES ('Finance');
 
-INSERT INTO role (name) VALUES ('User');
-INSERT INTO role (name) VALUES ('Administrator');
-
-INSERT INTO user_table (email, username, password, full_name) VALUES (
+INSERT INTO user_table (email, username, password, full_name, role) VALUES (
     'test@test.cz',
     'vhais',
     '$2a$12$X5su42X7E8jAEDe526nMdusjePL/fuA5GxUqQz4UsW.0zhHv/npNm',
-    'Vratislav Hais'
+    'Vratislav Hais',
+    'ROLE_ADMIN'
 );
 
-INSERT INTO user_roles (user_id, role_id) VALUES (
-    (SELECT id FROM user_table WHERE username = 'vhais'),
-    (SELECT id FROM role WHERE name = 'Administrator')
+INSERT INTO user_table (email, username, password, full_name, role) VALUES (
+    'test@test2.cz',
+    'test',
+    '$2a$12$X5su42X7E8jAEDe526nMdusjePL/fuA5GxUqQz4UsW.0zhHv/npNm',
+    'Vratislav Hais',
+    'ROLE_USER'
 );
 
 INSERT INTO tag (name) VALUES ('first');

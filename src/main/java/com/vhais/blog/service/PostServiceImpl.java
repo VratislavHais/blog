@@ -8,24 +8,22 @@ import com.vhais.blog.model.Tag;
 import com.vhais.blog.model.User;
 import com.vhais.blog.repository.CategoryRepository;
 import com.vhais.blog.repository.PostRepository;
-import com.vhais.blog.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
+@Service("postService")
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
@@ -91,7 +89,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponsePostDTO getPostForEditing(Long id) {
+    @PreAuthorize("@postService.canUserEditPost(#id)")
+    public ResponsePostDTO getPostForEditing(@P("id") Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
         ResponsePostDTO response = new ResponsePostDTO();
         response.setId(post.getId());
@@ -103,7 +102,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post editPost(Long id, PostDTO postDTO) {
+    @PreAuthorize("@postService.canUserEditPost(#id)")
+    public Post editPost(@P("id") Long id, PostDTO postDTO) {
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
 
         post.setUpdatedAt(LocalDateTime.now());
@@ -115,5 +115,12 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDTO.getTitle());
 
         return postRepository.save(post);
+    }
+
+    @Override
+    public boolean canUserEditPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        Optional<User> user = userService.getAuthenticatedUser();
+        return (user.isPresent() && ("ROLE_ADMIN".equals(user.get().getRole()) || post.getAuthor() == user.get()));
     }
 }
