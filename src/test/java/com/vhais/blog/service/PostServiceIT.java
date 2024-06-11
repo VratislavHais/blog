@@ -2,20 +2,19 @@ package com.vhais.blog.service;
 
 import com.vhais.blog.dto.PostDTO;
 import com.vhais.blog.model.Category;
+import com.vhais.blog.model.Comment;
 import com.vhais.blog.model.Post;
 import com.vhais.blog.model.Tag;
 import com.vhais.blog.model.User;
 import com.vhais.blog.repository.CategoryRepository;
+import com.vhais.blog.repository.CommentRepository;
 import com.vhais.blog.repository.PostRepository;
 import com.vhais.blog.repository.TagRepository;
 import com.vhais.blog.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,6 +48,9 @@ public class PostServiceIT {
     private TagRepository tagRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     private PostService postService;
 
     @Autowired
@@ -70,7 +72,7 @@ public class PostServiceIT {
         category = categoryRepository.save(new Category("test"));
 
         User testUser = new User();
-        testUser.setUsername("test");
+        testUser.setUsername("it_test");
         testUser.setEmail("hais@test.cz");
         testUser.setPassword("test");
         user = userRepository.save(testUser);
@@ -87,7 +89,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testSavingPost_thenRetrievingCategoryIfPostIsPresent() {
         Optional<Category> retrievedCategory = categoryRepository.findById(category.getId());
         assertThat(retrievedCategory).isNotEmpty();
@@ -95,7 +97,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testSavingPost_thenRetrievingUserIfPostIsPresent() {
         Optional<User> retrievedUser = userRepository.findById(user.getId());
         assertThat(retrievedUser).isNotEmpty();
@@ -103,7 +105,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testSavingPost_thenRetrievingTagsIfPostIsPresent() {
         for (Tag tag : Set.of(tag1, tag2)) {
             Optional<Tag> retrievedTag = tagRepository.findById(tag.getId());
@@ -113,14 +115,14 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostById_whenPostExists() {
         Post retrieved = postService.getPostById(post.getId());
         assertThat(retrieved).isEqualTo(post);
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostById_whenPostDoesNotExist() {
         assertThatExceptionOfType(EntityNotFoundException.class)
                 .describedAs("Post with id " + (post.getId() + 1) + " not found")
@@ -128,7 +130,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByCategoryName_whenCategoryHasPosts() {
         List<Post> posts = postService.getPostsByCategoryName(category.getName());
         assertThat(posts).isNotEmpty();
@@ -136,7 +138,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByCategoryName_whenCategoryHasNoPosts() {
         Category newCategory = new Category("new");
         categoryRepository.save(newCategory);
@@ -145,7 +147,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByCategoryName_whenCategoryHasMultiplePosts() {
         List<Post> posts = createMultiplePosts(5);
         posts.add(post);
@@ -156,7 +158,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByUsername_whenUserHasPosts() {
         List<Post> posts = postService.getPostsByAuthorUsername(user.getUsername());
         assertThat(posts).isNotEmpty();
@@ -164,7 +166,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByUsername_whenUserHasNoPosts() {
         User newUser = new User();
         newUser.setUsername("new");
@@ -176,7 +178,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByUsername_whenUserHasMultiplePosts() {
         List<Post> posts = createMultiplePosts(5);
         posts.add(post);
@@ -187,7 +189,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByTagName_whenTagsHavePosts() {
         for (Tag tag : Set.of(tag1, tag2)) {
             List<Post> posts = postService.getPostsByTagName(tag.getName());
@@ -197,7 +199,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByTagName_whenTagHasNoPosts() {
         Tag newTag = new Tag("newTag");
         tagRepository.save(newTag);
@@ -206,7 +208,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByTagName_whenTagsHaveMultiplePosts() {
         List<Post> posts = createMultiplePosts(5, tag1, tag2);
         posts.add(post);
@@ -219,7 +221,7 @@ public class PostServiceIT {
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "it_test")
     public void testGettingPostsByTagName_whenOneHasPostsAndSecondDoNot() {
         List<Post> posts = createMultiplePosts(5, tag1);
 
@@ -248,5 +250,27 @@ public class PostServiceIT {
             posts.add(postService.savePost(newPost));
         }
         return posts;
+    }
+
+    @Test
+    @WithMockUser(username = "it_test")
+    public void testDeletingPost() {
+        Comment comment = new Comment();
+        comment.setContent("test");
+        comment.setPost(post);
+        comment.setAuthor(user);
+        comment = commentRepository.save(comment);
+        post.setComments(List.of(comment));
+
+        postService.deletePost(post.getId());
+
+        assertThat(commentRepository.findById(comment.getId())).isEmpty();
+
+        assertThat(postRepository.findById(post.getId())).isEmpty();
+
+        assertThat(userRepository.findById(user.getId()).get().getPosts()).doesNotContain(post);
+        for (Tag tag : Set.of(tag1, tag2)) {
+            assertThat(tagRepository.findById(tag.getId()).get().getPosts()).doesNotContain(post);
+        }
     }
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,9 +75,15 @@ public class PostController {
         }
     }
 
-    @PutMapping("edit/{id}")
+    @PostMapping("edit/{id}")
     public String editPost(@PathVariable Long id, @ModelAttribute PostDTO postDTO, Model model) {
         postService.editPost(id, postDTO);
         return "redirect:/post/" + id;
+    }
+
+    @GetMapping("delete/{id}")
+    public String deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return "redirect:" + HOME;
     }
 }

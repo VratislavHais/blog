@@ -233,7 +233,7 @@
 <body>
 <div class="container">
     <a href="/" class="close-btn">✖</a>
-    <a href="/" class="trash-btn" th:if="${canEdit}"><i class="fas fa-trash"></i></a>
+    <a th:href="@{/post/delete/{id}(id=${post.id})}" class="trash-btn" th:if="${canEdit}"><i class="fas fa-trash"></i></a>
     <a th:href="@{/post/edit/{id}(id=${post.id})}" class="edit-btn" th:if="${canEdit}"><i class="fas fa-pen"></i></a>
 
     <h1 th:text="${post.title}"></h1>

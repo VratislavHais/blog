@@ -17,4 +17,5 @@ public interface PostService {
     ResponsePostDTO getPostForEditing(Long id);
     Post editPost(Long id, PostDTO postDTO);
     boolean canUserEditPost(Long postId);
+    void deletePost(Long id);
 }

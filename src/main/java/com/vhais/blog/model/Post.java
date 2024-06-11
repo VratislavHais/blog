@@ -66,7 +66,7 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany
+    @OneToMany(mappedBy = "post", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     public void addTag(Tag tag) {

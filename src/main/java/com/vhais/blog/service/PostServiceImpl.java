@@ -7,6 +7,7 @@ import com.vhais.blog.model.Post;
 import com.vhais.blog.model.Tag;
 import com.vhais.blog.model.User;
 import com.vhais.blog.repository.CategoryRepository;
+import com.vhais.blog.repository.CommentRepository;
 import com.vhais.blog.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
     private final UserService userService;
     private final TagService tagService;
 
@@ -122,5 +124,16 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId).orElseThrow();
         Optional<User> user = userService.getAuthenticatedUser();
         return (user.isPresent() && ("ROLE_ADMIN".equals(user.get().getRole()) || post.getAuthor() == user.get()));
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("@postService.canUserEditPost(#id)")
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found"));
+
+        post.getAuthor().removePost(post);
+        post.getTags().forEach(tag -> tag.removePost(post));
+        postRepository.delete(post);
     }
 }
