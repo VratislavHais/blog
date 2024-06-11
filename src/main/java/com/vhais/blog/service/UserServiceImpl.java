@@ -6,6 +6,7 @@ import com.vhais.blog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -25,27 +26,28 @@ public class UserServiceImpl implements UserService {
         user.setFullName(userDTO.getFullName());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setUsername(userDTO.getUsername());
-        return repository.save(user);
+        user.setRole("ROLE_USER");
+        return userRepository.save(user);
     }
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = repository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsername(username);
         return user.orElseThrow(() -> new UsernameNotFoundException(String.format("User with username %s not found.", username)));
     }
 
     @Override
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof User));
+        return (authentication != null && authentication.isAuthenticated() && (authentication.getPrincipal() instanceof UserDetails));
     }
 
     @Override
     public Optional<User> getAuthenticatedUser() {
         Optional<User> result = Optional.empty();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof User) {
-            result = repository.findByUsername(authentication.getName());
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
+            result = userRepository.findByUsername(authentication.getName());
         }
         return result;
     }
