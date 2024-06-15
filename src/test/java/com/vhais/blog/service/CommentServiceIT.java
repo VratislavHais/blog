@@ -114,7 +114,7 @@ public class CommentServiceIT {
         commentDTO.setContent("test");
         Comment comment = commentService.saveCommentUnderPost(commentDTO, post.getId());
 
-        commentService.deleteComment(comment.getId(), post.getId(), user.getUsername());
+        commentService.deleteComment(comment.getId(), post.getId());
 
         user = userRepository.findById(user.getId()).get();
         assertThat(user.getComments()).doesNotContain(comment);

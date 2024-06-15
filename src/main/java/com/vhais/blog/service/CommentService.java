@@ -10,8 +10,9 @@ import java.util.List;
 public interface CommentService {
     Comment saveComment(Comment comment);
     Comment saveCommentUnderPost(CommentDTO commentDTO, Long postId);
-    void deleteComment(Long commentId, Long postId, String username);
+    void deleteComment(Long commentId, Long postId);
     List<Comment> getCommentsByPost(Long postId);
     List<Comment> getCommentsByAuthor(Long userId);
     List<Comment> getCommentsByUsername(String username);
+    boolean canUserEditComment(Long commentId);
 }

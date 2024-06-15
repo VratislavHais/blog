@@ -11,14 +11,16 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-@Service
+@Service("commentService")
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
@@ -54,10 +56,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void deleteComment(Long commentId, Long postId, String username) {
+    @PreAuthorize("@commentService.canUserEditComment(#commentId)")
+    public void deleteComment(Long commentId, Long postId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post with id " + postId + " not found"));
-        User author = userService.loadUserByUsername(username);
+        User author = userService.loadUserByUsername(comment.getAuthor().getUsername());
         post.removeComment(comment);
         author.removeComment(comment);
 
@@ -77,5 +80,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<Comment> getCommentsByUsername(String username) {
         return commentRepository.findByAuthor_Username(username);
+    }
+
+    @Override
+    public boolean canUserEditComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Optional<User> user = userService.getAuthenticatedUser();
+        return (user.isPresent() && ("ROLE_ADMIN".equals(user.get().getRole()) || comment.getAuthor() == user.get()));
     }
 }
