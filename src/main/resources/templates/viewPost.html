@@ -266,17 +266,25 @@
     <div class="content">
         <p th:text="${post.content}"></p>
     </div>
-    <div class="tags-container" onclick="toggleTagsEditor(event)">
+    <div class="tags-container" onclick="toggleTagsEditor(event)" th:if="${canEdit}">
         <div class="tags">
-            <a th:each="tag : ${post.tags}" th:href="@{/api/post/{postId}/tags/{tagId}/delete(postId=${post.id},tagId=${tag.id})}">
+            <a th:each="tag : ${tags}" th:href="@{/api/post/{postId}/tags/{tagId}/delete(postId=${post.id},tagId=${tag.id})}">
                 <span th:text="${tag.name}"></span>
-                <span class="delete-btn">✖</span>
+                <span class="delete-btn" th:if="${canEdit}">✖</span>
             </a>
         </div>
-        <div class="tags-editor">
+        <div class="tags-editor" th:if="${canEdit}">
             <form th:action="@{/api/post/{postId}/tags/add(postId=${post.id})}" method="post">
                 <input type="text" name="newTag" onkeydown="submitTag(event, [[${post.id}]])" />
             </form>
+        </div>
+    </div>
+    <div class="tags-container" th-if="!${canEdit}">
+        <div class="tags">
+            <div th:each="tag : ${tags}">
+                <span th:text="${tag.name}"></span>
+                <span class="delete-btn" th:if="${canEdit}">✖</span>
+            </div>
         </div>
     </div>
 

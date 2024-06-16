@@ -5,6 +5,7 @@ import com.vhais.blog.dto.PostDTO;
 import com.vhais.blog.dto.ResponsePostDTO;
 import com.vhais.blog.model.Comment;
 import com.vhais.blog.model.Post;
+import com.vhais.blog.model.Tag;
 import com.vhais.blog.repository.CategoryRepository;
 import com.vhais.blog.service.CommentService;
 import com.vhais.blog.service.PostService;
@@ -20,7 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -58,14 +62,17 @@ public class PostController {
         try {
             Post post = postService.getPostById(id);
             boolean canEditPost = postService.canUserEditPost(id);
-            Map<Comment, Boolean> comments = new HashMap<>();
-            for (Comment comment : post.getComments()) {
-                comments.put(comment, commentService.canUserEditComment(comment.getId()));
+            List<Comment> comments = post.getComments();
+            comments.sort(Comparator.comparing(Comment::getCreatedAt));
+            Map<Comment, Boolean> commentPermission = new LinkedHashMap<>();
+            for (Comment comment : comments) {
+                commentPermission.put(comment, commentService.canUserEditComment(comment.getId()));
             }
             model.addAttribute("post", post);
             model.addAttribute("newComment", new CommentDTO());
             model.addAttribute("canEdit", canEditPost);
-            model.addAttribute("comments", comments);
+            model.addAttribute("comments", commentPermission);
+            model.addAttribute("tags", post.getTags().stream().sorted(Comparator.comparing(Tag::getName)));
             return "viewPost";
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
